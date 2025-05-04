@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Per Kragh Andersen &amp; Henrik Ravn">
-<meta name="dcterms.date" content="2025-04-27">
+<meta name="dcterms.date" content="2025-05-04">
 
 <title>Survival Analysis in Clinical Trials</title>
 <style>
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -113,7 +147,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 27, 2025</p>
+      <p class="date">May 4, 2025</p>
     </div>
   </div>
   
@@ -127,13 +161,71 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="lectures-exercises" class="level2">
 <h2 class="anchored" data-anchor-id="lectures-exercises">Lectures &amp; exercises</h2>
-<p><a href="./files/SACT25_intro.pdf">Lecture slides for 5 May</a><br>
-</p>
+<p><a href="./files/SACT25_intro.pdf">Lecture slides for day 1</a><br>
+<!-- [Solutions for day 1](/files/day1.R)\ --> <!-- [Lecture slides for day 2](/files/SACT25_Cox.pdf)\ --> <!-- [Solutions for day 2](/files/day2.R)\ --></p>
 </section>
 <section id="data" class="level2">
 <h2 class="anchored" data-anchor-id="data">Data</h2>
 <p><a href="./files/pbc3.csv">PBC3 trial in liver cirrhosis: <code>pbc3.csv</code></a><br>
 </p>
+</section>
+<section id="r-functions" class="level2">
+<h2 class="anchored" data-anchor-id="r-functions">R functions</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Risk difference based on Kaplan-Meier</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>riskdiff<span class="ot">&lt;-</span><span class="cf">function</span>(km,t){ </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  kmsurv<span class="ot">&lt;-</span> <span class="fu">summary</span>(km, t)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  risk0 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>kmsurv<span class="sc">$</span>surv[<span class="dv">1</span>]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  risk1 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">-</span>kmsurv<span class="sc">$</span>surv[<span class="dv">2</span>]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  sd0 <span class="ot">&lt;-</span> kmsurv<span class="sc">$</span>std.err[<span class="dv">1</span>]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  sd1 <span class="ot">&lt;-</span> kmsurv<span class="sc">$</span>std.err[<span class="dv">2</span>]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  rd <span class="ot">&lt;-</span>risk1<span class="sc">-</span>risk0</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(sd0<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> sd1<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Risk0 = "</span>,<span class="fu">round</span>(risk0,<span class="dv">6</span>)))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Risk1 = "</span>,<span class="fu">round</span>(risk1,<span class="dv">6</span>)))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Riskdiff (SD) [95%-CI]</span><span class="sc">\n</span><span class="st">"</span>,rd,<span class="st">" ("</span>,sd,<span class="st">")"</span>, <span class="st">" ["</span>, rd<span class="fl">-1.96</span><span class="sc">*</span>sd, <span class="st">" to "</span>, rd<span class="fl">+1.96</span><span class="sc">*</span>sd,<span class="st">"]"</span>, <span class="at">sep=</span><span class="st">""</span>) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># RMST difference based on Kaplan-Meier</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>rmstdiff<span class="ot">&lt;-</span><span class="cf">function</span>(km,t){</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  rmst <span class="ot">&lt;-</span> <span class="fu">summary</span>(km, <span class="at">rmean=</span>t)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  m0 <span class="ot">&lt;-</span> rmst<span class="sc">$</span>table[<span class="dv">1</span>,<span class="dv">5</span>]</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> rmst<span class="sc">$</span>table[<span class="dv">2</span>,<span class="dv">5</span>]</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  md <span class="ot">&lt;-</span> m1<span class="sc">-</span>m0</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(rmst<span class="sc">$</span>table[<span class="dv">1</span>,<span class="dv">6</span>]<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> rmst<span class="sc">$</span>table[<span class="dv">2</span>,<span class="dv">6</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"RMST0 = "</span>,<span class="fu">round</span>(m0,<span class="dv">6</span>)))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"RMST1 = "</span>,<span class="fu">round</span>(m1,<span class="dv">6</span>)))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"RMSTDiff (SD) [95%-CI]</span><span class="sc">\n</span><span class="st">"</span>, md,<span class="st">" ("</span>,sd,<span class="st">")"</span>, <span class="st">" ["</span>, md<span class="fl">-1.96</span><span class="sc">*</span>sd, <span class="st">" to "</span>, md<span class="fl">+1.96</span><span class="sc">*</span>sd,<span class="st">"]"</span>, <span class="at">sep=</span><span class="st">""</span>) </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Risk difference based on Aalen-Johansen</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>cidiff<span class="ot">&lt;-</span><span class="cf">function</span>(aj,<span class="at">etype=</span><span class="dv">2</span>,t){</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  ajt<span class="ot">&lt;-</span> <span class="fu">summary</span>(aj, t) </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  prob0 <span class="ot">&lt;-</span> ajt<span class="sc">$</span>pstate[<span class="dv">1</span>,etype] </span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  prob1 <span class="ot">&lt;-</span> ajt<span class="sc">$</span>pstate[<span class="dv">2</span>,etype]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  sd0 <span class="ot">&lt;-</span> ajt<span class="sc">$</span>std.err[<span class="dv">1</span>,etype] </span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  sd1 <span class="ot">&lt;-</span> ajt<span class="sc">$</span>std.err[<span class="dv">2</span>,etype] </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  dd <span class="ot">&lt;-</span> prob1<span class="sc">-</span>prob0 </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(sd0<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> sd1<span class="sc">^</span><span class="dv">2</span>) </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Event type ="</span>,aj<span class="sc">$</span>state[etype])) </span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"prob0 ="</span>,<span class="fu">round</span>(prob0,<span class="dv">6</span>)))</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"prob1 ="</span>,<span class="fu">round</span>(prob1,<span class="dv">6</span>)))</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"ProbDiff (SD) [95%-CI]</span><span class="sc">\n</span><span class="st">"</span>,dd,<span class="st">" ("</span>,sd,<span class="st">")"</span>, <span class="st">" ["</span>, dd<span class="fl">-1.96</span><span class="sc">*</span>sd, <span class="st">" to "</span>, dd<span class="fl">+1.96</span><span class="sc">*</span>sd,<span class="st">"]"</span>, <span class="at">sep=</span><span class="st">""</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Years lost difference based on Aalen-Johansen</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>yldiff<span class="ot">&lt;-</span><span class="cf">function</span>(aj,<span class="at">etype=</span><span class="dv">1</span>,t){</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  yl <span class="ot">&lt;-</span> <span class="fu">summary</span>(aj,<span class="at">rmean=</span>t)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  m0 <span class="ot">&lt;-</span> yl<span class="sc">$</span>table[<span class="dv">2</span><span class="sc">*</span>etype<span class="dv">-1</span>,<span class="dv">3</span>]</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  m1 <span class="ot">&lt;-</span> yl<span class="sc">$</span>table[<span class="dv">2</span><span class="sc">*</span>etype,<span class="dv">3</span>]</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  md <span class="ot">&lt;-</span> m1<span class="sc">-</span>m0</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(yl<span class="sc">$</span>table[<span class="dv">2</span><span class="sc">*</span>etype<span class="dv">-1</span>,<span class="dv">4</span>]<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> yl<span class="sc">$</span>table[<span class="dv">2</span><span class="sc">*</span>etype,<span class="dv">4</span>]<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Event type ="</span>,aj<span class="sc">$</span>state[etype]))</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"mean0 = "</span>,<span class="fu">round</span>(m0,<span class="dv">6</span>)))</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"mean1 = "</span>,<span class="fu">round</span>(m1,<span class="dv">6</span>)))</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"MeanDiff (SD) [95%-CI]</span><span class="sc">\n</span><span class="st">"</span>,md,<span class="st">" ("</span>,sd,<span class="st">")"</span>, <span class="st">" ["</span>, md<span class="fl">-1.96</span><span class="sc">*</span>sd, <span class="st">" to "</span>, md<span class="fl">+1.96</span><span class="sc">*</span>sd,<span class="st">"]"</span>, <span class="at">sep=</span><span class="st">""</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
 </section>

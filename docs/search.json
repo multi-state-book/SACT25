@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Survival Analysis in Clinical Trials",
+    "section": "",
+    "text": "Intro to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2\n\n\n\n\nIJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values"
+  },
+  {
+    "objectID": "index.html#part-i",
+    "href": "index.html#part-i",
+    "title": "Survival Analysis in Clinical Trials",
+    "section": "",
+    "text": "Intro to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2"
+  },
+  {
+    "objectID": "index.html#part-ii",
+    "href": "index.html#part-ii",
+    "title": "Survival Analysis in Clinical Trials",
+    "section": "",
+    "text": "IJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values"
+  },
+  {
+    "objectID": "index.html#r-functions",
+    "href": "index.html#r-functions",
+    "title": "Survival Analysis in Clinical Trials",
+    "section": "R functions",
+    "text": "R functions\n\npbc3 &lt;- read.csv(\"data/pbc3.csv\")\npbc3$years &lt;- pbc3$days/365.25\npbc3$fail &lt;- as.numeric(with(pbc3, status&gt;0))\npbc3$fstatus &lt;- factor(pbc3$status, 0:2, labels=c(\"cens\", \"trans\", \"death\"))\npbc3$log2bili &lt;- log2(pbc3$bili)\n\n# Summary functions for pseudo observations fit\nposumm&lt;-function(pofit,d=6){\n    round(cbind(\n    Est   = pofit$beta,\n    SD    = sqrt(diag(pofit$vbeta)),\n    lo.ci = pofit$beta-1.96*sqrt(diag(pofit$vbeta)),\n    up.ci = pofit$beta+1.96*sqrt(diag(pofit$vbeta)),\n    Wald  = (pofit$beta/sqrt(diag(pofit$vbeta)))^2,\n    PVal  = 2-2*pnorm(abs(pofit$beta/sqrt(diag(pofit$vbeta))))),d)\n}\n\nposummExp&lt;-function(pofit,d=6){\n    round(cbind(\n    est       = pofit$beta,\n    SD        = sqrt(diag(pofit$vbeta)),\n    exp.est   = exp(pofit$beta),\n    exp.lo.ci = exp(pofit$beta-1.96*sqrt(diag(pofit$vbeta))),\n    exp.up.ci = exp(pofit$beta+1.96*sqrt(diag(pofit$vbeta))),\n    PVal      = 2-2*pnorm(abs(pofit$beta/sqrt(diag(pofit$vbeta))))),d)\n}\n\n# Risk difference based on Kaplan-Meier\nriskdiff&lt;-function(km,t){ \n  kmsurv&lt;- summary(km, t)\n  risk0 &lt;- 1-kmsurv$surv[1]\n  risk1 &lt;- 1-kmsurv$surv[2]\n  sd0 &lt;- kmsurv$std.err[1]\n  sd1 &lt;- kmsurv$std.err[2]\n  rd &lt;-risk1-risk0\n  sd &lt;- sqrt(sd0^2 + sd1^2)\n  print(paste(\"Risk0 = \",round(risk0,6)))\n  print(paste(\"Risk1 = \",round(risk1,6)))\n  cat(\"Riskdiff (SD) [95%-CI]\\n\",rd,\" (\",sd,\")\", \" [\", rd-1.96*sd, \" to \", rd+1.96*sd,\"]\", sep=\"\") \n}\n\n# RMST difference based on Kaplan-Meier\nrmstdiff&lt;-function(km,t){\n  rmst &lt;- summary(km, rmean=t)\n  m0 &lt;- rmst$table[1,5]\n  m1 &lt;- rmst$table[2,5]\n  md &lt;- m1-m0\n  sd &lt;- sqrt(rmst$table[1,6]^2 + rmst$table[2,6]^2)\n  print(paste(\"RMST0 = \",round(m0,6)))\n  print(paste(\"RMST1 = \",round(m1,6)))\n  cat(\"RMSTDiff (SD) [95%-CI]\\n\", md,\" (\",sd,\")\", \" [\", md-1.96*sd, \" to \", md+1.96*sd,\"]\", sep=\"\") \n}\n\n# Risk difference based on Aalen-Johansen\ncidiff&lt;-function(aj,etype=2,t){\n  ajt&lt;- summary(aj, t) \n  prob0 &lt;- ajt$pstate[1,etype] \n  prob1 &lt;- ajt$pstate[2,etype]\n  sd0 &lt;- ajt$std.err[1,etype] \n  sd1 &lt;- ajt$std.err[2,etype] \n  dd &lt;- prob1-prob0 \n  sd &lt;- sqrt(sd0^2 + sd1^2) \n  print(paste(\"Event type =\",aj$state[etype])) \n  print(paste(\"prob0 =\",round(prob0,6)))\n  print(paste(\"prob1 =\",round(prob1,6)))\n  cat(\"ProbDiff (SD) [95%-CI]\\n\",dd,\" (\",sd,\")\", \" [\", dd-1.96*sd, \" to \", dd+1.96*sd,\"]\", sep=\"\")\n}\n\n# Years lost difference based on Aalen-Johansen\nyldiff&lt;-function(aj,etype=1,t){\n  yl &lt;- summary(aj,rmean=t)\n  m0 &lt;- yl$table[2*etype-1,3]\n  m1 &lt;- yl$table[2*etype,3]\n  md &lt;- m1-m0\n  sd &lt;- sqrt(yl$table[2*etype-1,4]^2 + yl$table[2*etype,4]^2)\n  print(paste(\"Event type =\",aj$state[etype]))\n  print(paste(\"mean0 = \",round(m0,6)))\n  print(paste(\"mean1 = \",round(m1,6)))\n  cat(\"MeanDiff (SD) [95%-CI]\\n\",md,\" (\",sd,\")\", \" [\", md-1.96*sd, \" to \", md+1.96*sd,\"]\", sep=\"\")\n}"
+  }
+]

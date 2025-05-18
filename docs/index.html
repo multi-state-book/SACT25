@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Per Kragh Andersen &amp; Henrik Ravn">
-<meta name="dcterms.date" content="2025-05-14">
+<meta name="dcterms.date" content="2025-05-18">
 
 <title>Survival Analysis in Clinical Trials</title>
 <style>
@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 14, 2025</p>
+      <p class="date">May 18, 2025</p>
     </div>
   </div>
   
@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Lectures &amp; exercises</h1>
 <section id="part-i" class="level2">
 <h2 class="anchored" data-anchor-id="part-i">Part I</h2>
-<p><a href="./files/SACT25_intro.pdf">Intro to survival analysis</a><br>
+<p><a href="./files/SACT25_intro.pdf">Introduction to survival analysis</a><br>
 <a href="./files/SACT25_Cox.pdf">Intensity models: Cox regression</a><br>
 </p>
 <p><a href="./files/Day1.R">R solutions for day 1</a><br>
@@ -180,23 +180,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <a href="./files/SACT25_MarginalRec.pdf">Marginal analysis of recurrent events</a><br>
 <a href="./files/SACT25_Pseudo.pdf">Pseudo-values</a><br>
 </p>
-<!-- [Exercises](/files/ExercisesII.pdf)\ -->
-<!-- [R Solutions](/files/PartII.R)\ -->
+<p><a href="./files/ExercisesII.pdf">Exercises</a><br>
+<!-- [R Solutions](/files/PartII.R)\ --></p>
 </section>
 </section>
 <section id="data" class="level1">
 <h1>Data</h1>
 <p><a href="./files/pbc3.csv">PBC3 trial in liver cirrhosis: <code>pbc3.csv</code></a><br>
 </p>
-<!-- [Recurrent events data `rr`.csv`](/data/rr.csv) -->
-<!-- | Variable name | Description                                                           | -->
-<!-- |:-----------|:-------------------------------------------------------------------------| -->
-<!-- | `id`       | patient id                                    | -->
-<!-- | `start`    | start time (years) -->
-<!-- | `stop`     | stop time (years) -->
-<!-- | `status`   | 0 = censoring, 1 = event, 2 = death | -->
-<!-- | `tment`    | randomized treatment: 0 = placebo, 1 = active                    | -->
-<!-- | `male`     | 0 = female, 1 = male                                                | -->
+<p><a href="./data/rr.csv">Recurrent events data <code>rr</code>.csv`</a></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Variable name</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>id</code></td>
+<td style="text-align: left;">patient id</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>start</code></td>
+<td style="text-align: left;">start time (years)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>stop</code></td>
+<td style="text-align: left;">stop time (years)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>status</code></td>
+<td style="text-align: left;">0 = censoring, 1 = event, 2 = death</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>tment</code></td>
+<td style="text-align: left;">randomized treatment: 0 = placebo, 1 = active</td>
+</tr>
+</tbody>
+</table>
 <section id="r-functions" class="level2">
 <h2 class="anchored" data-anchor-id="r-functions">R functions</h2>
 <div class="cell">

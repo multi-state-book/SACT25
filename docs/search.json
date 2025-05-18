@@ -4,21 +4,21 @@
     "href": "index.html",
     "title": "Survival Analysis in Clinical Trials",
     "section": "",
-    "text": "Intro to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2\n\n\n\n\nIJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values"
+    "text": "Introduction to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2\n\n\n\n\nIJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values\n\nExercises"
   },
   {
     "objectID": "index.html#part-i",
     "href": "index.html#part-i",
     "title": "Survival Analysis in Clinical Trials",
     "section": "",
-    "text": "Intro to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2"
+    "text": "Introduction to survival analysis\nIntensity models: Cox regression\n\nR solutions for day 1\nR solutions for day 2"
   },
   {
     "objectID": "index.html#part-ii",
     "href": "index.html#part-ii",
     "title": "Survival Analysis in Clinical Trials",
     "section": "",
-    "text": "IJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values"
+    "text": "IJE paper\n\n\nIntensity models for illness-death and recurrent events\nMarginal analysis of competing risks\nMarginal analysis of recurrent events\nPseudo-values\n\nExercises"
   },
   {
     "objectID": "index.html#r-functions",
